@@ -29,7 +29,8 @@ class BotState(Enum):
 
 def start(update: Update, context: CallbackContext) -> int:
     update.message.reply_text(
-        f'{MESSAGES["greeting"]} {MESSAGES["get_new_question"]}',
+        f'{MESSAGES["greeting"]} {MESSAGES["get_new_question"]}\n'
+        f'{MESSAGES["how_to_stop"]}',
         reply_markup=reply_markup,
     )
 
@@ -37,7 +38,7 @@ def start(update: Update, context: CallbackContext) -> int:
 
 
 def handle_new_question_request(update: Update,
-                                context: CallbackContext) -> None:
+                                context: CallbackContext) -> int:
     question = choice(questions_list)
 
     redis_db.set(f'tg_{update.effective_user.id}', question)
@@ -49,7 +50,7 @@ def handle_new_question_request(update: Update,
     return BotState.AWAIT_ANSWER
 
 
-def handle_solution_attempt(update: Update, context: CallbackContext) -> None:
+def handle_solution_attempt(update: Update, context: CallbackContext) -> int:
     question = redis_db.get(f'tg_{update.effective_user.id}')
     correct_answer = questions[question]
 
@@ -66,7 +67,7 @@ def handle_solution_attempt(update: Update, context: CallbackContext) -> None:
     return BotState.AWAIT_ANSWER
 
 
-def handle_surrender_request(update: Update, context: CallbackContext) -> None:
+def handle_surrender_request(update: Update, context: CallbackContext) -> int:
     question = redis_db.get(f'tg_{update.effective_user.id}')
     correct_answer = questions[question]
 
@@ -77,7 +78,11 @@ def handle_surrender_request(update: Update, context: CallbackContext) -> None:
     return BotState.NEW_QUESTION
 
 
-def stop(update: Update, context: CallbackContext):
+def stop(update: Update, context: CallbackContext) -> int:
+    update.message.reply_text(
+        MESSAGES['game_stopped'],
+        reply_markup=reply_markup,
+    )
     return ConversationHandler.END
 
 
@@ -94,7 +99,7 @@ if __name__ == '__main__':
 
     redis_host = env.str('REDIS_DB_HOST')
     redis_port = env.int('REDIS_DB_PORT')
-    redis_password = env.str('REDIS_DB_PASSWORD')
+    redis_password = env.str('REDIS_DB_PASSWORD', None)
 
     redis_db = redis.Redis(host=redis_host,
                            port=redis_port,

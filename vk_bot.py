@@ -5,7 +5,8 @@ from environs import Env
 import redis
 import vk_api as vk
 from vk_api.keyboard import VkKeyboard
-from vk_api.longpoll import VkLongPoll, VkEventType
+from vk_api.longpoll import VkLongPoll, VkEventType, Event
+from vk_api.vk_api import VkApiMethod
 
 from bot_strings import BUTTONS, MESSAGES
 from logs_handler import TelegramLogsHandler
@@ -27,7 +28,7 @@ def create_keyboard():
     return keyboard.get_keyboard()
 
 
-def start(event, vk_api):
+def start(event: Event, vk_api: VkApiMethod) -> None:
     redis_db.set(f'vk_{event.user_id}', '')
 
     vk_api.messages.send(
@@ -38,7 +39,7 @@ def start(event, vk_api):
     )
 
 
-def handle_new_question_request(event, vk_api):
+def handle_new_question_request(event: Event, vk_api: VkApiMethod) -> None:
     question = choice(questions_list)
 
     redis_db.set(f'vk_{event.user_id}', question)
@@ -50,7 +51,7 @@ def handle_new_question_request(event, vk_api):
     )
 
 
-def handle_surrender_request(event, vk_api):
+def handle_surrender_request(event: Event, vk_api: VkApiMethod) -> None:
     question = redis_db.get(f'vk_{event.user_id}')
     correct_answer = questions.get(question)
 
@@ -64,7 +65,7 @@ def handle_surrender_request(event, vk_api):
     )
 
 
-def handle_solution_attempt(event, vk_api):
+def handle_solution_attempt(event: Event, vk_api: VkApiMethod) -> None:
     question = redis_db.get(f'vk_{event.user_id}')
     correct_answer = questions.get(question)
 
@@ -100,7 +101,7 @@ if __name__ == "__main__":
 
     redis_host = env.str('REDIS_DB_HOST')
     redis_port = env.int('REDIS_DB_PORT')
-    redis_password = env.str('REDIS_DB_PASSWORD')
+    redis_password = env.str('REDIS_DB_PASSWORD', None)
 
     redis_db = redis.Redis(host=redis_host,
                            port=redis_port,

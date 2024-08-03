@@ -33,7 +33,7 @@
 
     REDIS_DB_HOST='хост базы данных Redis'
     REDIS_DB_PORT='порт базы данных Redis'
-    REDIS_DB_PASSWORD='пароль базы данных Redis'
+    REDIS_DB_PASSWORD='пароль базы данных Redis', по-умолчанию `None`
 
     TG_LOGS_CHAT_ID='id чата в телеграме для отправки логов'
 

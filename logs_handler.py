@@ -4,7 +4,7 @@ from telegram import Bot
 
 
 class TelegramLogsHandler(Handler):
-    def __init__(self, tg_bot_token, chat_id) -> None:
+    def __init__(self, tg_bot_token: str, chat_id: str) -> None:
         super().__init__()
 
         self.chat_id = chat_id
