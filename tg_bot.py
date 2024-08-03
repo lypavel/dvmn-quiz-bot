@@ -13,7 +13,7 @@ from logs_handler import TelegramLogsHandler
 from questions import check_answer, get_questions_with_answers, \
     get_questions_list
 
-logger = logging.getLogger(__name__)
+logger = logging.getLogger(__file__)
 
 reply_keyboard = [
     [BUTTONS['new_question'], BUTTONS['surrender']],
