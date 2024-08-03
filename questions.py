@@ -7,7 +7,6 @@ from environs import Env
 
 def check_answer(user_answer: str, correct_answer: str) -> bool:
     correct_answer = remove_clarifications(correct_answer)
-    print(correct_answer)
     if user_answer.lower() == correct_answer.split('.', 1)[0].lower():
         return True
     return False

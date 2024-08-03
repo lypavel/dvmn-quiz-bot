@@ -32,7 +32,7 @@ def start(event, vk_api):
 
     vk_api.messages.send(
         user_id=event.user_id,
-        message=MESSAGES['greeting'],
+        message=f'{MESSAGES["greeting"]} {MESSAGES["get_new_question"]}',
         random_id=randint(1, 1000),
         keyboard=create_keyboard()
     )
@@ -100,9 +100,11 @@ if __name__ == "__main__":
 
     redis_host = env.str('REDIS_DB_HOST')
     redis_port = env.int('REDIS_DB_PORT')
+    redis_password = env.str('REDIS_DB_PASSWORD')
 
     redis_db = redis.Redis(host=redis_host,
                            port=redis_port,
+                           password=redis_password,
                            decode_responses=True)
 
     all_questions_file = env.str('ALL_QUESTIONS_FILE', 'questions.json')
