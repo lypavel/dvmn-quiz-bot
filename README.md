@@ -2,17 +2,20 @@
 
 ## Пример работы
 
-* [Бот для телеграма]()
-* [Бот для ВК]()
-
-<details>
-  <summary>Пример работы телеграм бота</summary>
-  <img src="" alt="">
-</details>
+* [Бот для телеграма](https://t.me/devman_lessons_bot)
+    <details>
+    <summary>Пример работы</summary>
+    <img src="https://dvmn.org/filer/canonical/1569215494/324/" alt="Пример работы телеграм бота">
+    </details>
+* [Бот для ВК](https://vk.com/club226638798)
+    <details>
+    <summary>Пример работы</summary>
+    <img src="https://dvmn.org/filer/canonical/1569215498/325/" alt="Пример работы вк бота">
+    </details>
 
 ## Установка
 
-1. Установите [Python 3.10.12]() и, если нужно, создайте виртуальное окружение и активируйте его:
+1. Установите [Python 3.10.12](https://www.python.org/downloads/release/python-31012/) и, если нужно, создайте виртуальное окружение и активируйте его:
     ```sh
     python3 -m venv venv
     source venv/bin/activate
@@ -21,8 +24,8 @@
     ```sh
     pip install -r requirements.txt
     ```
-3. Установите Redis по [инструкции из документации]().
-4. Получите токены для ВК и телеграм ботов. Подробнее описано в соответствующих документациях: [ВК](), [Телеграм]()
+3. Установите Redis по [инструкции из документации](https://redis.io/).
+4. Получите токены для ВК и телеграм ботов. Подробнее описано в соответствующих документациях: [ВК](https://dev.vk.com/ru/api/community-messages/getting-started), [Телеграм](https://core.telegram.org/bots/tutorial)
 5. В корне проекта создайте файл `.env` и поместите в него следующие переменные окружения:
     ```env
     TG_BOT_TOKEN='токен телеграм бота'
