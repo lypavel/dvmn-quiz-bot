@@ -26,6 +26,12 @@ def remove_clarifications(text: str) -> str:
     return text.strip()
 
 
+def clear_text(text: str) -> str:
+    return text.replace('\n', ' ')\
+               .split(':', 1)[1]\
+               .strip()
+
+
 def get_questions_with_answers(question_file: Path) -> dict:
     with open(question_file, 'r') as stream:
         questions_with_answers = json.load(stream)
@@ -52,21 +58,16 @@ def main() -> None:
         with open(file, 'r', encoding='KOI8-R') as stream:
             file_content = stream.read().split('\n\n')
 
-        line = 0
-        while line < len(file_content):
-            question = re.match(r'Вопрос \d+:\n', file_content[line])
-            if question:
-                question = question.string\
-                                   .replace('\n', ' ')\
-                                   .split(':', 1)[1]\
-                                   .strip()
-                answer = file_content[line+1].split(':\n', 1)[1]
-
-                questions_with_answers[question] = answer
-
-                line += 2
-            else:
-                line += 1
+        current_question = None
+        current_answer = None
+        for line in file_content:
+            if re.match(r'(\n)?Вопрос \d+:\n', line):
+                current_question = clear_text(line)
+            elif re.match(r'Ответ:\n', line):
+                current_answer = clear_text(line)
+                if current_question is not None:
+                    questions_with_answers[current_question] = current_answer
+                current_question = current_answer = None
 
     with open(all_questions_file, 'w', encoding='utf-8') as stream:
         stream.write(
