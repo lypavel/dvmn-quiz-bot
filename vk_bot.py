@@ -28,7 +28,7 @@ def create_keyboard():
     return keyboard.get_keyboard()
 
 
-def start(event: Event, vk_api: VkApiMethod) -> None:
+def start(event: Event, vk_api: VkApiMethod, redis_db: redis.Redis) -> None:
     redis_db.set(f'vk_{event.user_id}', '')
 
     vk_api.messages.send(
@@ -39,7 +39,10 @@ def start(event: Event, vk_api: VkApiMethod) -> None:
     )
 
 
-def handle_new_question_request(event: Event, vk_api: VkApiMethod) -> None:
+def handle_new_question_request(event: Event,
+                                vk_api: VkApiMethod,
+                                questions_list: list[str],
+                                redis_db: redis.Redis) -> None:
     question = choice(questions_list)
 
     redis_db.set(f'vk_{event.user_id}', question)
@@ -51,9 +54,12 @@ def handle_new_question_request(event: Event, vk_api: VkApiMethod) -> None:
     )
 
 
-def handle_surrender_request(event: Event, vk_api: VkApiMethod) -> None:
+def handle_surrender_request(event: Event,
+                             vk_api: VkApiMethod,
+                             questions_with_answers: dict,
+                             redis_db: redis.Redis) -> None:
     question = redis_db.get(f'vk_{event.user_id}')
-    correct_answer = questions.get(question)
+    correct_answer = questions_with_answers.get(question)
 
     redis_db.set(f'vk_{event.user_id}', '')
 
@@ -65,9 +71,12 @@ def handle_surrender_request(event: Event, vk_api: VkApiMethod) -> None:
     )
 
 
-def handle_solution_attempt(event: Event, vk_api: VkApiMethod) -> None:
+def handle_solution_attempt(event: Event,
+                            vk_api: VkApiMethod,
+                            questions_with_answers: dict,
+                            redis_db: redis.Redis) -> None:
     question = redis_db.get(f'vk_{event.user_id}')
-    correct_answer = questions.get(question)
+    correct_answer = questions_with_answers.get(question)
 
     if check_answer(event.text, correct_answer):
         redis_db.set(f'vk_{event.user_id}', '')
@@ -87,7 +96,7 @@ def handle_solution_attempt(event: Event, vk_api: VkApiMethod) -> None:
     )
 
 
-if __name__ == "__main__":
+def main():
     env = Env()
     env.read_env()
 
@@ -109,8 +118,8 @@ if __name__ == "__main__":
                            decode_responses=True)
 
     all_questions_file = env.str('ALL_QUESTIONS_FILE', 'questions.json')
-    questions = get_questions_with_answers(all_questions_file)
-    questions_list = get_questions_list(questions)
+    questions_with_answers = get_questions_with_answers(all_questions_file)
+    questions_list = get_questions_list(questions_with_answers)
 
     vk_token = env.str('VK_API_TOKEN')
     vk_session = vk.VkApi(token=vk_token)
@@ -121,10 +130,13 @@ if __name__ == "__main__":
             if event.type == VkEventType.MESSAGE_NEW and event.to_me:
                 current_question = redis_db.get(f'vk_{event.user_id}')
                 if current_question is None:
-                    start(event, vk_api)
+                    start(event, vk_api, redis_db)
                 elif not current_question:
                     if event.text == BUTTONS['new_question']:
-                        handle_new_question_request(event, vk_api)
+                        handle_new_question_request(event,
+                                                    vk_api,
+                                                    questions_list,
+                                                    redis_db)
                         continue
 
                     vk_api.messages.send(
@@ -134,8 +146,18 @@ if __name__ == "__main__":
                         random_id=randint(1, 1000)
                     )
                 elif event.text == BUTTONS['surrender']:
-                    handle_surrender_request(event, vk_api)
+                    handle_surrender_request(event,
+                                             vk_api,
+                                             questions_with_answers,
+                                             redis_db)
                 else:
-                    handle_solution_attempt(event, vk_api)
+                    handle_solution_attempt(event,
+                                            vk_api,
+                                            questions_with_answers,
+                                            redis_db)
     except Exception as exception:
         logger.exception(exception)
+
+
+if __name__ == "__main__":
+    main()
