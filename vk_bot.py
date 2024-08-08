@@ -1,4 +1,5 @@
 import logging
+from pathlib import Path
 from random import choice, randint
 
 from environs import Env
@@ -13,7 +14,7 @@ from logs_handler import TelegramLogsHandler
 from questions import check_answer, get_questions_with_answers, \
     get_questions_list
 
-logger = logging.getLogger(__file__)
+logger = logging.getLogger(Path(__file__).name)
 
 
 def create_keyboard():
