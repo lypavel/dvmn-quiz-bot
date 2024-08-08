@@ -1,3 +1,5 @@
+from telegram import ReplyKeyboardMarkup
+
 BUTTONS = {
     'new_question': 'Новый вопрос',
     'surrender': 'Сдаться',
@@ -16,3 +18,10 @@ MESSAGES = {
     'game_stopped': 'Викторина остановлена. '
     'Для возобновления используйте команду \"/start\"',
 }
+
+TG_REPLY_KEYBOARD = [
+    [BUTTONS['new_question'], BUTTONS['surrender']],
+    [BUTTONS['my_score']]
+]
+
+TG_REPLY_MARKUP = ReplyKeyboardMarkup(TG_REPLY_KEYBOARD)
